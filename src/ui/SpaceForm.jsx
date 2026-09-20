@@ -1,86 +1,94 @@
 import React from 'react';
-import { ArrowRight, Maximize2 } from 'lucide-react';
 import { useConfigStore } from '../store/useConfigStore';
+import { fmt } from '../utils/format';
 
 export default function SpaceForm() {
-  const { roomWidthFt, roomDepthFt, setRoomWidth, setRoomDepth, setStep } = useConfigStore();
-
-  const handleNext = () => {
-    if (roomWidthFt && roomDepthFt) {
-      setStep(2);
-    }
-  };
+  const {
+    roomWidthFt, roomDepthFt, budget, wantTub, hasPower,
+    setRoomWidthFt, setRoomDepthFt, setBudget, setWantTub, setHasPower,
+    setStep,
+  } = useConfigStore();
 
   return (
-    <div className="max-w-2xl mx-auto">
-      <div className="glass-card rounded-3xl p-8 space-y-8 border-white/20">
+    <div className="max-w-xl mx-auto">
+      <h2 className="font-serif text-3xl text-stone-800 mb-2">Tell us about your space</h2>
+      <p className="text-stone-500 text-sm mb-8">
+        Room size and budget are hard limits -- everything the engine recommends will respect both.
+      </p>
+
+      <div className="space-y-7">
         <div>
-          <h2 className="text-4xl font-bold text-slate-900 mb-3">Tell us about your space</h2>
-          <p className="text-lg text-slate-600">Help us optimize your bathroom design for your room dimensions</p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Width Input */}
-          <div className="space-y-2">
-            <label className="block text-sm font-bold text-slate-900">Room Width</label>
-            <div className="relative">
-              <Maximize2 className="absolute left-4 top-1/2 -translate-y-1/2 text-blue-500" size={20} />
-              <input
-                type="number"
-                value={roomWidthFt || ''}
-                onChange={(e) => setRoomWidth(parseFloat(e.target.value) || 0)}
-                placeholder="Enter width in feet"
-               
-                className="w-full pl-12 pr-4 py-4 rounded-xl bg-white/90 border-2 border-white/40 text-slate-900 placeholder-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 font-bold text-lg transition"
-              />
-            </div>
-            <p className="text-xs text-slate-500 ml-4">Typical: 5-10 feet</p>
-          </div>
-
-          {/* Depth Input */}
-          <div className="space-y-2">
-            <label className="block text-sm font-bold text-slate-900">Room Depth</label>
-            <div className="relative">
-              <Maximize2 className="absolute left-4 top-1/2 -translate-y-1/2 text-indigo-500" size={20} />
-              <input
-                type="number"
-                value={roomDepthFt || ''}
-                onChange={(e) => setRoomDepth(parseFloat(e.target.value) || 0)}
-                placeholder="Enter depth in feet"
-                min="4"
-                max="20"
-                className="w-full pl-12 pr-4 py-4 rounded-xl bg-white/90 border-2 border-white/40 text-slate-900 placeholder-slate-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 font-bold text-lg transition"
-              />
-            </div>
-            <p className="text-xs text-slate-500 ml-4">Typical: 5-10 feet</p>
+          <label className="block text-xs font-semibold tracking-wide text-stone-500 mb-2">
+            ROOM DIMENSIONS (FEET)
+          </label>
+          <div className="flex items-center gap-3 max-w-xs">
+            <input
+              type="number" min="4" max="20" step="0.5" value={roomWidthFt}
+              onChange={(e) => setRoomWidthFt(+e.target.value)}
+              className="w-full border border-stone-300 rounded-md px-3 py-2.5 text-base"
+            />
+            <span className="text-stone-400">x</span>
+            <input
+              type="number" min="4" max="20" step="0.5" value={roomDepthFt}
+              onChange={(e) => setRoomDepthFt(+e.target.value)}
+              className="w-full border border-stone-300 rounded-md px-3 py-2.5 text-base"
+            />
+            <span className="text-stone-400 text-sm">ft</span>
           </div>
         </div>
 
-        {/* Room Preview */}
-        {roomWidthFt && roomDepthFt && (
-          <div className="p-6 rounded-2xl bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200">
-            <p className="text-sm text-slate-600 mb-2">Your bathroom space</p>
-            <div className="flex items-baseline gap-2">
-              <p className="text-3xl font-bold text-slate-900">
-                {roomWidthFt} × {roomDepthFt} ft
-              </p>
-              <p className="text-lg font-bold text-slate-600">
-                ({Math.round(roomWidthFt * roomDepthFt)} sq ft)
-              </p>
-            </div>
+        <div>
+          <label className="block text-xs font-semibold tracking-wide text-stone-500 mb-2">
+            BUDGET
+          </label>
+          <div className="font-serif text-4xl text-stone-800 mb-2">{fmt(budget)}</div>
+          <input
+            type="range" min="80000" max="1500000" step="10000" value={budget}
+            onChange={(e) => setBudget(+e.target.value)}
+            className="w-full max-w-md accent-amber-700"
+          />
+          <div className="flex justify-between text-[11px] text-stone-400 max-w-md mt-1">
+            <span>{fmt(80000)}</span>
+            <span>{fmt(1500000)}</span>
           </div>
-        )}
+        </div>
 
-        {/* Next Button */}
-        <button
-          onClick={handleNext}
-          disabled={!roomWidthFt || !roomDepthFt}
-          className="w-full py-4 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold text-lg hover:shadow-2xl hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 transition-all"
-        >
-          Next: Choose Your Style
-          <ArrowRight size={20} />
-        </button>
+        <div>
+          <label className="block text-xs font-semibold tracking-wide text-stone-500 mb-2">
+            BATHTUB
+          </label>
+          <select
+            value={wantTub ? 'yes' : 'no'}
+            onChange={(e) => setWantTub(e.target.value === 'yes')}
+            className="border border-stone-300 rounded-md px-3 py-2.5 text-base max-w-xs w-full"
+          >
+            <option value="no">No -- shower only</option>
+            <option value="yes">Yes, if space allows</option>
+          </select>
+        </div>
+
+        <label className="flex items-start gap-3 max-w-md cursor-pointer">
+          <input
+            type="checkbox"
+            checked={hasPower}
+            onChange={(e) => setHasPower(e.target.checked)}
+            className="mt-1 w-4 h-4"
+          />
+          <span className="text-sm text-stone-600 leading-snug">
+            Power outlet available near the toilet location
+            <span className="block text-stone-400 text-xs mt-0.5">
+              Unchecked excludes smart/bidet toilets -- a real compatibility constraint, not a preference.
+            </span>
+          </span>
+        </label>
       </div>
+
+      <button
+        onClick={() => setStep(2)}
+        className="mt-10 bg-stone-800 hover:bg-stone-700 text-white text-sm font-semibold px-6 py-3 rounded-md"
+      >
+        Continue to style &rarr;
+      </button>
     </div>
   );
 }

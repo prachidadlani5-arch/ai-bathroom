@@ -1,66 +1,51 @@
 import React from 'react';
-import { Droplets, Waves, Wind, Circle } from 'lucide-react';
 import { useConfigStore } from '../store/useConfigStore';
 import { fmt } from '../utils/format';
+const LABEL = { toilet: 'Toilet', shower: 'Shower / Bath', vanity: 'Vanity', faucet: 'Faucet' };
+const ORDER = ['toilet', 'shower', 'vanity', 'faucet'];
 
-const CATEGORY_CONFIG = {
-  vanity: { label: 'Vanity', icon: Droplets, color: 'from-blue-500 to-indigo-600' },
-  faucet: { label: 'Faucet', icon: Waves, color: 'from-cyan-500 to-blue-600' },
-  shower: { label: 'Shower', icon: Wind, color: 'from-teal-500 to-cyan-600' },
-  toilet: { label: 'Toilet', icon: Circle, color: 'from-slate-500 to-gray-600' },
-};
 export default function BundleSummary() {
-  const { solutions, selectedIndex } = useConfigStore();
-  const selected = solutions[selectedIndex];
-  if (!selected) return null;
-
-  const { picks, total } = selected;
+  const { solutions, selectedIndex, budget, changedKeys } = useConfigStore();
+  const sol = solutions[selectedIndex];
+  if (!sol) return null;
 
   return (
-    <div className="glass-card rounded-2xl p-6 space-y-4 border-white/20">
-      <div>
-        <h3 className="text-lg font-bold text-slate-900 mb-1">Bundle Details</h3>
-        <p className="text-sm text-slate-600">Your selected fixture specifications</p>
+    <div className="w-[320px] bg-white/95 backdrop-blur border border-stone-200 rounded shadow-sm p-5 space-y-4">
+      <div className="flex justify-between items-baseline border-b border-stone-200 pb-3">
+        <div>
+          <span className="text-sm text-stone-500 block">{sol.label}</span>
+          <span className="text-[11px] text-stone-400">
+            {sol.withinBudget ? 'within budget' : 'over budget'} - {sol.fits ? 'fits room' : 'tight fit'}
+          </span>
+        </div>
+        <span className={'font-serif text-2xl ' + (sol.total > budget ? 'text-red-700' : 'text-stone-800')}>
+          {fmt(sol.total)}
+        </span>
       </div>
 
-      <div className="space-y-3">
-        {Object.entries(CATEGORY_CONFIG).map(([category, config]) => {
-          const Item = config.icon;
-          const product = picks[category];
-          if (!product) return null;
-
+      <div className="space-y-2">
+        {ORDER.map((cat) => {
+          const item = sol.picks[cat];
+          const changed = changedKeys.includes(cat);
           return (
             <div
-              key={category}
-              className="p-4 rounded-xl bg-gradient-to-r from-white/90 to-white/70 border border-white/30 hover:border-white/60 transition"
+              key={cat}
+              className={
+                'flex items-center justify-between text-sm rounded px-1.5 py-1 -mx-1.5 ' +
+                (changed ? 'bg-amber-50 ring-1 ring-amber-300' : '')
+              }
             >
-              <div className="flex items-start gap-3">
-                <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${config.color} flex items-center justify-center flex-shrink-0`}>
-                  <Item size={20} className="text-white" />
+              <div>
+                <div className="text-[10px] uppercase tracking-wide text-amber-800 font-semibold flex items-center gap-1.5">
+                  {LABEL[cat]}
+                  {changed && <span className="text-amber-600">- updated</span>}
                 </div>
-                <div className="flex-1 min-w-0">
-                  <h4 className="font-bold text-slate-900 text-sm">{config.label}</h4>
-                  <p className="text-xs text-slate-600 truncate">{product.name}</p>
-                  <div className="flex items-center gap-2 mt-1">
-                    <span className="inline-block px-2 py-0.5 rounded-full bg-slate-100 text-xs font-medium text-slate-700">
-                      {fmt(product.price)}
-                    </span>
-                    <span className="text-xs text-slate-500">Quality {Math.round(product.quality * 100)}/100</span>
-                  </div>
-                </div>
+                <div className="font-serif text-stone-800">{item.name}</div>
               </div>
+              <div className="text-stone-500 text-xs">{fmt(item.price)}</div>
             </div>
           );
         })}
-      </div>
-
-      <div className="pt-4 border-t border-white/30">
-        <div className="flex items-center justify-between">
-          <span className="font-bold text-slate-900">Total Investment</span>
-          <span className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">
-            {fmt(total)}
-          </span>
-        </div>
       </div>
     </div>
   );

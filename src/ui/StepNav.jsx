@@ -1,56 +1,40 @@
 import React from 'react';
-import { Check, Ruler, Palette, Sparkles } from 'lucide-react';
 import { useConfigStore } from '../store/useConfigStore';
 
 const STEPS = [
-  { number: 1, label: 'Space', icon: Ruler, description: 'Room dimensions' },
-  { number: 2, label: 'Style', icon: Palette, description: 'Style & budget' },
-  { number: 3, label: 'Results', icon: Sparkles, description: 'Your solutions' },
+  { n: 1, label: 'Space' },
+  { n: 2, label: 'Style' },
+  { n: 3, label: 'Your bathroom' },
 ];
 
 export default function StepNav() {
-  const { currentStep, setStep, roomWidthFt, roomDepthFt } = useConfigStore();
+  const { currentStep, setStep, solutions } = useConfigStore();
 
   return (
-    <div className="flex items-center gap-2">
-      {STEPS.map((step, index) => {
-        const Icon = step.icon;
-        const isActive = currentStep === step.number;
-        const isCompleted = 
-          (step.number === 1 && roomWidthFt && roomDepthFt) ||
-          (step.number < currentStep);
-        const isClickable = step.number < currentStep || (step.number === 1);
-
+    <nav className="flex items-center gap-1 text-sm">
+      {STEPS.map((s, i) => {
+        const reachable = s.n === 1 || s.n === 2 || (s.n === 3 && solutions.length > 0);
+        const active = currentStep === s.n;
         return (
-          <React.Fragment key={step.number}>
+          <div key={s.n} className="flex items-center gap-1">
             <button
-              onClick={() => isClickable && setStep(step.number)}
-              disabled={!isClickable}
-              className={`
-                flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-sm transition-all
-                ${
-                  isActive
-                    ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg'
-                    : isCompleted
-                    ? 'bg-green-100 text-green-700 hover:bg-green-200'
-                    : 'bg-white/20 text-white/60 cursor-not-allowed'
-                }
-              `}
+              disabled={!reachable}
+              onClick={() => reachable && setStep(s.n)}
+              className={
+                'px-3 py-1.5 rounded-full font-medium transition ' +
+                (active
+                  ? 'bg-stone-800 text-white'
+                  : reachable
+                  ? 'text-stone-500 hover:text-stone-800'
+                  : 'text-stone-300 cursor-not-allowed')
+              }
             >
-              {isCompleted && !isActive ? (
-                <Check size={16} className="flex-shrink-0" />
-              ) : (
-                <Icon size={16} className="flex-shrink-0" />
-              )}
-              <span className="hidden sm:inline">{step.label}</span>
+              {s.n}. {s.label}
             </button>
-
-            {index < STEPS.length - 1 && (
-              <div className="w-2 h-1 rounded-full bg-white/20" />
-            )}
-          </React.Fragment>
+            {i < STEPS.length - 1 && <span className="text-stone-300">&mdash;</span>}
+          </div>
         );
       })}
-    </div>
+    </nav>
   );
 }
