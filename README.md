@@ -1,4 +1,4 @@
-# KOHLER AI Bathroom Designer & Planner
+# AI Bathroom Designer & Planner
 
 An interactive 3D bathroom design assistant that converts a user's **room dimensions, budget, style preferences, and functional constraints** into optimized bathroom product bundles.
 
@@ -18,7 +18,7 @@ Designing a bathroom involves balancing multiple constraints at once:
 * Product quality
 * Different possible combinations
 
-The **KOHLER AI Bathroom Designer** automates this process.
+The **AI Bathroom Designer** automates this process.
 
 A user provides their bathroom requirements, and the system evaluates possible combinations of:
 
